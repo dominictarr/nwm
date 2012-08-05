@@ -294,6 +294,11 @@ void nwm_raise_window (Window win) {
   XFlush(nwm.dpy);
 }
 
+void nwm_lower_window (Window win) {
+  XLowerWindow(nwm.dpy, win);
+  XFlush(nwm.dpy);
+}
+
 void nwm_configure_window(Window win, int x, int y, int width, int height,
   int border_width, int above, int detail, int value_mask) {
   XWindowChanges wc;
