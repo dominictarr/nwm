@@ -16,7 +16,10 @@ start () {
   if [ "x$1" = x ]; then
     log='2> "$nwm_dir/nwm.err.log" 1> "$nwm_dir/nwm.log"'
   fi
-    node "$dir/nwm-user-sample.js" $log
+
+  node "$dir/nwm-user-sample.js" $log
+  #force cleanup
+  test -e /tmp/.X1-lock && kill -9 `cat /tmp/.X1-lock`; rm -f /tmp/.X1-lock
   exit
 }
 
@@ -89,7 +92,7 @@ xephyr () {
     size="$1"
   fi
   Xephyr -screen "$size" -nodri -br :1 &
-  DISPLAY=:1 start --nolog
+    DISPLAY=:1 start --nolog
 }
 
 console () {
