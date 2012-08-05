@@ -17,9 +17,13 @@
   "devDependencies": {
     "mocha": "~1.2.1"
   },
-  "bin":"./nwm", 
+  "bin": "./nwm",
   "scripts": {
     "test": "mocha",
     "postinstall": "./nwm init; cd ./build; make"
+  },
+  "dependencies": {
+    "rc": "0.0.3",
+    "event-tree": "0.0.3"
   }
 }
