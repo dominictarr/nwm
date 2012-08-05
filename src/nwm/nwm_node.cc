@@ -81,6 +81,8 @@ static void Emit(callback_map event, void *ev) {
         INT_FIELD(y, e->y);
         INT_FIELD(width, e->width);
         INT_FIELD(height, e->height);
+        INT_FIELD(root, e->root);
+        INT_FIELD(parent, e->parent);
         INT_FIELD(isfloating, e->isfloating);
       }
       break;

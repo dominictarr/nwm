@@ -336,6 +336,10 @@ void nwm_add_window(Window win, XWindowAttributes *wa) {
   XConfigureEvent ce;
   nwm_window event_data;
   XWindowChanges wc;
+  Window parent = 0;
+  Window root = 0; 
+  Window* children;  
+  unsigned int nchildren = 0;
 
   // check whether the window is transient
   XGetTransientForHint(nwm.dpy, win, &trans);
@@ -349,8 +353,17 @@ void nwm_add_window(Window win, XWindowAttributes *wa) {
   event_data.height = wa->height;
   event_data.width = wa->width;
   event_data.isfloating = isfloating;
-  nwm_emit(onAddWindow, (void *)&event_data);
 
+  //XQueryTree(nwm.dpy, win, root, parent, children, nchildren);
+
+  XQueryTree(nwm.dpy, win, &root, &parent, &children, &nchildren);
+  event_data.root = (int)root;
+  event_data.parent = (int)parent; 
+
+  //children may change, so it's better to just track the parents.
+  free(children);
+
+  nwm_emit(onAddWindow, (void *)&event_data);
   // push the window id so we know what windows we've seen
   List_push(&nwm.windows, (void *)win);
 

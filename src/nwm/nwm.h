@@ -91,6 +91,8 @@ typedef struct {
   int y;
   int width;
   int height;
+  int root;
+  int parent;
   Bool isfloating;
 } nwm_window;
 
