@@ -235,6 +235,12 @@ static Handle<Value> KillWindow(const Arguments& args) {
   return Undefined();
 }
 
+static Handle<Value> RaiseWindow(const Arguments& args) {
+  HandleScope scope;
+  nwm_raise_window(args[0]->Uint32Value());
+  return Undefined();
+}
+
 static Handle<Value> ConfigureWindow(const Arguments& args) {
   HandleScope scope;
   nwm_configure_window(args[0]->Uint32Value(), args[1]->IntegerValue(),
@@ -267,6 +273,8 @@ extern "C" {
     target->Set(String::New("resizeWindow"), FunctionTemplate::New(ResizeWindow)->GetFunction());
     target->Set(String::New("focusWindow"), FunctionTemplate::New(FocusWindow)->GetFunction());
     target->Set(String::New("killWindow"), FunctionTemplate::New(KillWindow)->GetFunction());
+    target->Set(String::New("raiseWindow"), FunctionTemplate::New(RaiseWindow)->GetFunction());
+
     target->Set(String::New("configureWindow"), FunctionTemplate::New(ConfigureWindow)->GetFunction());
     target->Set(String::New("notifyWindow"), FunctionTemplate::New(NotifyWindow)->GetFunction());
     // Setting up

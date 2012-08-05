@@ -49,6 +49,7 @@ extern void nwm_move_window(Window win, int x, int y);
 extern void nwm_resize_window(Window win, int width, int height);
 extern void nwm_focus_window(Window win);
 extern void nwm_kill_window(Window win);
+extern void nwm_raise_window(Window win);
 extern void nwm_configure_window(Window win, int x, int y, int width, int height, \
     int border_width, int above, int detail, int value_mask);
 extern void nwm_notify_window(Window win, int x, int y, int width, int height, \
