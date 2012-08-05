@@ -4,10 +4,9 @@ var NWM = require('./nwm.js'),
     Xh = require('./lib/x.js'),
     child_process = require('child_process'),
     con = require('./lib/console'),
-    join = require('path').join;
+    join = require('path').join,
+    config = require('./lib/config')
 
-//var path = join(process.env.HOME, '.nwm/repl-socket')
-var port = 25171
 // instantiate nwm and configure it
 var nwm = new NWM();
 
@@ -68,7 +67,7 @@ var keyboard_shortcuts = [
     key: 'Return', // enter key launches xterm
     modifier: [ 'shift' ],
     callback: function(event) {
-      child_process.spawn('xterm', ['-lc'], { env: process.env });
+      child_process.exec(config.term_cmd, {env: process.env, cwd: __dirname });
     }
   },
   {
@@ -168,23 +167,20 @@ var keyboard_shortcuts = [
   },
   {
     key: 'Escape',
-    modifier: [ 'shift' ],
     callback: function () {
       console.log('opening console')
-      var args = [
-          '-lc', 
-          '-e',
-          'sh -c "' + [
-            process.execPath,
-            join(__dirname, 'lib', 'console.js'), 
-            'client', 
-            port].join(' ') + '"'
-        ]
-      var cp = child_process.spawn('xterm',args, 
-        { env: process.env }); 
-
+      //I managed to break this...
+      //not sure what is wrong.
+      //possibly env differences between xephyr and
+      //logging in properly.
+      var cp = child_process.spawn(
+      'xterm',
+      ['-e', join(__dirname, 'lib', 'console.js')], {
+        env: process.env
+      }) 
       cp.stdout.pipe(process.stdout, {end: false})
       cp.stderr.pipe(process.stderr, {end: false})
+
       cp.on('exit', function () {
         console.log('console closed')
       })
@@ -215,6 +211,6 @@ keyboard_shortcuts.forEach(function(shortcut) {
 nwm.start(function() { });
 
 con.createServer({nwm: nwm, layouts: layouts, XK: XK, Xh: Xh})
-  .listen(port, function () {
-    console.log('connect to nwm repl on:', port)
+  .listen(config.console_port, function () {
+    console.log('connect to nwm repl on:', config.console_port)
   })
