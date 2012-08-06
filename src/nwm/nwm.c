@@ -357,8 +357,8 @@ void nwm_add_window(Window win, XWindowAttributes *wa) {
   //XQueryTree(nwm.dpy, win, root, parent, children, nchildren);
 
   XQueryTree(nwm.dpy, win, &root, &parent, &children, &nchildren);
-  event_data.root = (int)root;
-  event_data.parent = (int)parent; 
+  event_data.root = root;
+  event_data.parent = parent; 
 
   //children may change, so it's better to just track the parents.
   free(children);
