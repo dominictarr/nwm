@@ -6,9 +6,9 @@
 // Modules
 // -------
 
-var Collection = require('./lib/collection.js'),
-    Monitor = require('./lib/monitor.js'),
-    Window = require('./lib/window.js');
+var Collection = require('./lib/collection.js')
+var Monitor = require('./lib/monitor.js')
+//  Window = require('./lib/window.js');
 
 // Node Window Manager
 // -------------------
@@ -54,7 +54,9 @@ NWM.prototype.events = {
   // -------------
   // A new window is added
   addWindow: function(window) {
+    return
     if(window.id) {
+      
       var current_monitor = this.monitors.get(this.monitors.current);
       window.workspace = current_monitor.workspaces.current;
       // ignore monitor number from binding as windows should open on the focused monitor
@@ -285,20 +287,59 @@ NWM.prototype.addKey = function(keyobj, callback) {
   this.shortcuts.push({ key: keyobj.key, modifier: keyobj.modifier, callback: callback });
 };
 
+var windows = {}
+
 // Start the window manager
 NWM.prototype.start = function(callback) {
   var self = this;
   // Initialize event handlers, bind this in the functions to nwm
+  var Window = require('./lib/window2')(this.wm)
+  var windows = {}
+  this.on('addWindow', function (event) {
+    var w = new Window(event, this)
+   
+    var current_monitor = this.monitors.get(this.monitors.current);
+
+    w.workspace = current_monitor.workspaces.current;
+    w.monitor = this.monitors.current;
+
+    if(current_monitor.focused_window == null) {
+      current_monitor.focused_window = w.id;
+    }
+    // do not add floating windows
+    if(w.isfloating
+      // do not add windows that are fixed ( min_width = max_width and min_height = max_height)
+      // We need the size info from updatesizehins to do this
+      // || (window.width == current_monitor.width && window.height == current_monitor.height)
+      ) {
+      console.log('Ignoring floating window: ', w);
+      this.floaters.push(w.id);
+      return;
+    }
+    if(w.x > current_monitor.width || w.y > current_monitor.height) {
+      w.move(1, 1);
+    }
+    this.windows.add(w);
+    windows[w.id] = w
+  })
   Object.keys(this.events).forEach(function(eventname) {
-    self.wm.on(eventname, function() {
+    self.wm.on(eventname, function(event) {
+      if(eventname == 'addWindow') {
+        self.emit(eventname, event)
+      }
+      else if(event.id && windows[event.id]) {
+        windows[event.id].emit(eventname, event)
+      }
+      else
+        console.log('WEIRD EVENT', eventname, event)
+        
       var args = Array.prototype.slice.call(arguments);
-      console.log('JS: ', eventname, args);
+            
       self.events[eventname].apply(self, args);
     });
   });
 
   var grab_keys = [];
-  console.log(this.shortcuts);
   this.shortcuts.forEach(function(shortcut) {
     grab_keys.push( { key: shortcut.key, modifier: shortcut.modifier });
   });
