@@ -19,7 +19,7 @@ nwm.addLayout('grid', layouts.grid);
 
 // convinience functions for writing the keyboard shortcuts
 function currentMonitor() {
-  return nwm.monitors.get(nwm.monitors.current);
+  return nwm.monitor //s.get(nwm.monitors.current);
 }
 
 function moveToMonitor(window, currentMonitor, otherMonitorId) {
@@ -82,11 +82,10 @@ var keyboard_shortcuts = [
     key: 'space', // space switches between layout modes
     callback: function(event) {
       var monitor = currentMonitor();
-      var workspace = monitor.currentWorkspace();
-      workspace.layout = nwm.nextLayout(workspace.layout);
+      monitor.layout = nwm.nextLayout(monitor.layout);
       // monocle hides windows in the current workspace, so unhide them
       monitor.go(monitor.workspaces.current);
-      workspace.rearrange();
+      monitor.rearrange();
     }
   },
   {
@@ -105,9 +104,9 @@ var keyboard_shortcuts = [
     key: 'Tab', // tab makes the current window the main window
     callback: function(event) {
       var monitor = currentMonitor();
-      var workspace = monitor.currentWorkspace();
-      workspace.mainWindow = monitor.focused_window;
-      workspace.rearrange();
+      monitor.cycle() 
+      //setMainWindow(monitor.focused_window)
+      monitor.rearrange();
     }
   },
   {

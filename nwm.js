@@ -8,14 +8,15 @@
 
 var Collection = require('./lib/collection.js')
 var Monitor = require('./lib/monitor.js')
-//  Window = require('./lib/window.js');
+var wm = require('./build/Release/nwm.node');
+var Window = require('./lib/window.js');
 
 // Node Window Manager
 // -------------------
 var NWM = function() {
   // A reference to the nwm C++ X11 binding
-  this.wm = require('./build/Release/nwm.node');
   // Known layouts
+  this.wm = wm
   this.layouts = {};
   // Keyboard shortcut lookup
   this.shortcuts = [];
@@ -35,17 +36,20 @@ NWM.prototype.events = {
   // --------------
   // A new monitor is added
   addMonitor: function(monitor) {
+    return
     this.monitors.add(new Monitor(this, monitor));
     this.monitors.current = monitor.id;
   },
 
   // A monitor is updated
   updateMonitor: function(monitor) {
+    return
     this.monitors.update(monitor.id, monitor);
   },
 
   // A monitor is removed
   removeMonitor: function(id) {
+    return
     console.log('Remove monitor', id);
     this.monitors.remove(function(monitor){ return (monitor.id != id); });
   },
@@ -53,42 +57,7 @@ NWM.prototype.events = {
   // Window events
   // -------------
   // A new window is added
-  addWindow: function(window) {
-    return
-    if(window.id) {
-      
-      var current_monitor = this.monitors.get(this.monitors.current);
-      window.workspace = current_monitor.workspaces.current;
-      // ignore monitor number from binding as windows should open on the focused monitor
-      window.monitor = this.monitors.current;
-
-      if(current_monitor.focused_window == null) {
-        current_monitor.focused_window = window.id;
-      }
-      // do not add floating windows
-      if(window.isfloating
-        // do not add windows that are fixed ( min_width = max_width and min_height = max_height)
-        // We need the size info from updatesizehins to do this
-        // || (window.width == current_monitor.width && window.height == current_monitor.height)
-        ) {
-        console.log('Ignoring floating window: ', window);
-        this.floaters.push(window.id);
-        return;
-      }
-      var win = new Window(this, window);
-      // windows might be placed outside the screen if the wm was terminated
-      if(win.x > current_monitor.width || win.y > current_monitor.height) {
-        win.move(1, 1);
-      }
-      console.log('Add window', {
-        window: window,
-        current_monitor: {
-          width: current_monitor.width,
-          height: current_monitor.height
-        }
-      });
-      this.windows.add(win);
-    }
+  addWindow: function(window) { return 
   },
 
   // When a window is removed
@@ -135,17 +104,17 @@ NWM.prototype.events = {
       }
       // use the monitor dimensions associated with the window
       var monitor = this.monitors.get(window.monitor);
-      var workspace = monitor.workspaces.get(monitor.workspaces.current);
+
       if(status) {
         console.log('!! resize', { id: id, x: monitor.x, y: monitor.y, width: monitor.width, height: monitor.height });
         this.wm.moveWindow(id, monitor.x, monitor.y);
         this.wm.resizeWindow(id, monitor.width, monitor.height);
         // we should also protect the window from being disturbed by rearranges
         if(this.layouts['monocle']) {
-          workspace.layout = 'monocle';
+          monitor.layout = 'monocle';
         }
       } else {
-        workspace.rearrange();
+        monitor.rearrange();
       }
     }
   },
@@ -245,7 +214,7 @@ NWM.prototype.events = {
     var monitors = Object.keys(this.monitors.items);
     monitors.forEach(function(id) {
       var monitor = self.monitors.get(id);
-      monitor.workspaces.get(monitor.workspaces.current).rearrange();
+      monitor.rearrange();
     });
   },
 
@@ -293,15 +262,15 @@ var windows = {}
 NWM.prototype.start = function(callback) {
   var self = this;
   // Initialize event handlers, bind this in the functions to nwm
-  var Window = require('./lib/window')(this.wm)
+  //var Window = //require('./lib/window')(this.wm)
   var windows = {}
   this.on('addWindow', function (event) {
-    var w = new Window(event, this)
+    var w = new Window(event, this.monitor)
    
-    var current_monitor = this.monitors.get(this.monitors.current);
-
-    w.workspace = current_monitor.workspaces.current;
-    w.monitor = this.monitors.current;
+//    w.workspace = current_monitor.workspaces.current;
+    var current_monitor = 
+    w.workspace = 
+    w.monitor = this.monitor //s.current;
 
     if(current_monitor.focused_window == null) {
       current_monitor.focused_window = w.id;
@@ -322,9 +291,13 @@ NWM.prototype.start = function(callback) {
     this.windows.add(w);
     windows[w.id] = w
   })
+  this.on('addMonitor', function (event) {
+    this.monitor = new Monitor(event, this)
+  })
+
   Object.keys(this.events).forEach(function(eventname) {
     self.wm.on(eventname, function(event) {
-      if(eventname == 'addWindow') {
+      if('addWindow' == eventname || 'addMonitor' == eventname) {
         self.emit(eventname, event)
       }
       else if(event.id && windows[event.id]) {
