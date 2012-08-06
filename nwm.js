@@ -293,7 +293,7 @@ var windows = {}
 NWM.prototype.start = function(callback) {
   var self = this;
   // Initialize event handlers, bind this in the functions to nwm
-  var Window = require('./lib/window2')(this.wm)
+  var Window = require('./lib/window')(this.wm)
   var windows = {}
   this.on('addWindow', function (event) {
     var w = new Window(event, this)
