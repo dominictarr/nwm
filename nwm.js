@@ -10,6 +10,7 @@ var Collection = require('./lib/collection.js')
 var Monitor = require('./lib/monitor.js')
 var wm = require('./build/Release/nwm.node');
 var Window = require('./lib/window.js');
+var EventTree = require('event-tree')
 
 // Node Window Manager
 // -------------------
@@ -18,7 +19,7 @@ var NWM = function() {
   this.shortcuts = [];
 }
 
-require('util').inherits(NWM, require('events').EventEmitter);
+require('util').inherits(NWM, EventTree);
 
 // Events
 // ------
@@ -71,7 +72,6 @@ NWM.prototype.start = function(callback) {
   var windows = {}
   this.on('addWindow', function (event) {
     var w = new Window(event, this.monitor)
-   
     var current_monitor = 
     w.workspace = 
     w.monitor = this.monitor //s.current;
@@ -79,18 +79,10 @@ NWM.prototype.start = function(callback) {
     if(current_monitor.focused_window == null) {
       current_monitor.focused_window = w.id;
     }
-    // do not add floating windows
-    if(w.isfloating
-      // do not add windows that are fixed ( min_width = max_width and min_height = max_height)
-      // We need the size info from updatesizehins to do this
-      // || (window.width == current_monitor.width && window.height == current_monitor.height)
-      ) {
-      //better to ignore floaters when changing the layout, or something like that.
-    }
-    if(w.x > current_monitor.width || w.y > current_monitor.height) {
-      w.move(1, 1);
-    }
     windows[w.id] = w
+    process.nextTick(function () {
+      this.monitor.emit('add', {source: w})   
+    }.bind(this))
   })
   this.on('addMonitor', function (event) {
     this.monitor = new Monitor(event, this)
