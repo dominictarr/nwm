@@ -24,6 +24,6 @@
   },
   "dependencies": {
     "rc": "0.0.3",
-    "event-tree": "0.0.3"
+    "event-tree": "0.1.0"
   }
 }
