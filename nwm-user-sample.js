@@ -11,18 +11,13 @@ var NWM = require('./nwm.js'),
 var nwm = new NWM();
 
 // load layouts
-var layouts = require('./lib/layouts');
-nwm.addLayout('tile', layouts.tile);
-nwm.addLayout('monocle', layouts.monocle);
-nwm.addLayout('wide', layouts.wide);
-nwm.addLayout('grid', layouts.grid);
-
 // convinience functions for writing the keyboard shortcuts
 function currentMonitor() {
   return nwm.monitor //s.get(nwm.monitors.current);
 }
 
 function moveToMonitor(window, currentMonitor, otherMonitorId) {
+  return
   if (window) {
     window.monitor = otherMonitorId;
     // set the workspace to the current workspace on that monitor
@@ -85,9 +80,7 @@ var keyboard_shortcuts = [
     key: 'space', // space switches between layout modes
     callback: function(event) {
       var monitor = currentMonitor();
-      monitor.layout = nwm.nextLayout(monitor.layout);
-      // monocle hides windows in the current workspace, so unhide them
-      //monitor.go(monitor.workspaces.current);
+      monitor.layouts.push(monitor.layouts.shift())
       monitor.rearrange();
     }
   },
@@ -216,7 +209,7 @@ keyboard_shortcuts.forEach(function(shortcut) {
 // START
 nwm.start(function() { });
 
-con.createServer({nwm: nwm, layouts: layouts, XK: XK, Xh: Xh})
+con.createServer({nwm: nwm, XK: XK, Xh: Xh})
   .listen(config.console_port, function () {
     console.log('connect to nwm repl on:', config.console_port)
   })
