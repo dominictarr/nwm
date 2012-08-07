@@ -52,6 +52,7 @@ var keyboard_shortcuts = [
   {
     key: [1, 2, 3, 4, 5, 6, 7, 8, 9], // number keys are used to move between screens
     callback: function(event) {
+      return //DISABLED
       currentMonitor().go(String.fromCharCode(event.keysym));
     }
   },
@@ -59,6 +60,7 @@ var keyboard_shortcuts = [
     key: [1, 2, 3, 4, 5, 6, 7, 8, 9], // with shift, move windows between workspaces
     modifier: [ 'shift' ],
     callback: function(event) {
+      return //DISABLED
       var monitor = currentMonitor();
       monitor.windowTo(monitor.focused_window, String.fromCharCode(event.keysym));
     }
@@ -75,7 +77,8 @@ var keyboard_shortcuts = [
     modifier: [ 'shift' ],
     callback: function(event) {
       var monitor = currentMonitor();
-      monitor.focused_window && nwm.wm.killWindow(monitor.focused_window);
+      monitor.focused_window && monitor.focused_window.close()
+//nwm.wm.killWindow(monitor.focused_window.id);
     }
   },
   {
@@ -84,7 +87,7 @@ var keyboard_shortcuts = [
       var monitor = currentMonitor();
       monitor.layout = nwm.nextLayout(monitor.layout);
       // monocle hides windows in the current workspace, so unhide them
-      monitor.go(monitor.workspaces.current);
+      //monitor.go(monitor.workspaces.current);
       monitor.rearrange();
     }
   },
@@ -113,6 +116,7 @@ var keyboard_shortcuts = [
     key: 'comma', // moving windows between monitors
     modifier: [ 'shift' ],
     callback: function(event) {
+      return //DISABLED
       var monitor = currentMonitor();
       var window = nwm.windows.get(monitor.focused_window);
       if(window) { // empty if no windows
@@ -124,6 +128,7 @@ var keyboard_shortcuts = [
     key: 'period', // moving windows between monitors
     modifier: [ 'shift' ],
     callback: function(event) {
+      return //DISABLED
       var monitor = currentMonitor();
       var window = nwm.windows.get(monitor.focused_window);
       if(window) { // empty if no windows
@@ -134,6 +139,7 @@ var keyboard_shortcuts = [
   {
     key: 'j', // moving focus
     callback: function() {
+      return //DISABLED
       var monitor = currentMonitor();
       if(monitor.focused_window && nwm.windows.exists(monitor.focused_window)) {
         var previous = nwm.windows.prev(monitor.focused_window);
@@ -147,6 +153,7 @@ var keyboard_shortcuts = [
   {
     key: 'k', // moving focus
     callback: function() {
+      return //DISABLED
       var monitor = currentMonitor();
       if(monitor.focused_window && nwm.windows.exists(monitor.focused_window)) {
         var next = nwm.windows.next(monitor.focused_window);
