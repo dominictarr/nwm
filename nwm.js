@@ -100,6 +100,7 @@ NWM.prototype.events = {
 
   // ConfigureRequest is generated when a client window wants to change its size, stacking order or border width
   configureRequest: function(ev){
+    
     console.log('configureRequest', ev);
     this.wm.configureWindow(ev.id, ev.x, ev.y, ev.width, ev.height, ev.border_width,
         ev.above, ev.detail, ev.value_mask);
@@ -138,11 +139,13 @@ NWM.prototype.events = {
   // ------------
   // A mouse button has been clicked
   mouseDown: function(event) {
+    return
     this.wm.focusWindow(event.id);
   },
 
   // A mouse drag is in progress
   mouseDrag: function(event) {
+    return
     // move when drag is triggered
     var change_x = event.move_x - event.x;
     var change_y = event.move_y - event.y;
@@ -154,6 +157,7 @@ NWM.prototype.events = {
 
   // Mouse enters a window
   enterNotify: function(event){
+    return
     if(this.windows.exists(event.id)) {
       var window = this.windows.get(event.id);
       console.log('focused monitor is ', this.monitors.current, 'focusing to', window.monitor, window.title);
@@ -188,6 +192,7 @@ NWM.prototype.events = {
   // Screen events
   // -------------
   rearrange: function() {
+    return
     var self = this;
     // rearrange current workspace on all monitors
     var monitors = Object.keys(this.monitors.items);
@@ -287,7 +292,7 @@ NWM.prototype.start = function(callback) {
         
       var args = Array.prototype.slice.call(arguments);
             
-      self.events[eventname].apply(self, args);
+      self.events[eventname] && self.events[eventname].apply(self, args);
     });
   });
 
